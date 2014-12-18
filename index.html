@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+    <!--head-->
+    <head>
+        <meta charset="utf-8">
+        <title>Timeline</title>
+        <link rel="stylesheet" href="./css/main.css">
+        <script type="text/javascript" src="./js/jquery.min.js"></script>
+        <script type="text/javascript" src="./js/jquery.masonry.min.js"/></script>
+        <script type="text/javascript" >
+        function Arrow_Points(){ 
+            var s = $('#container').find('.item');
+            $.each(s,function(i,obj){
+                var posLeft = $(obj).css("left");
+                $(obj).addClass('borderclass');
+                if(posLeft == "0px"){
+                html = "<span class='rightCorner'></span>";
+                $(obj).prepend(html); 
+                }
+                else{
+                html = "<span class='leftCorner'></span>";
+                $(obj).prepend(html);
+                }
+            });
+        }
+
+        $(document).ready(function(){
+        // masonry plugin call
+        $('#container').masonry({itemSelector : '.item',});
+        //draw arrow
+        Arrow_Points();
+
+        $('.timeline_container').mousemove(function(e){
+            var pag= e.pageY;
+            $('.plus').css({"top":pag +"px", "background":"url('./images/plus.png')","margin-left":"1px"});
+        }).mouseout(function(){
+            $('.plus').css({"background":"url('')"});
+        });
+
+        $("#container").delegate('.deletebox', 'click', function(){
+            if(confirm("Do you want to delete it?"))
+            {
+                $(this).parent().fadeOut('slow'); 
+                //Remove item block
+                $('#container').masonry( 'remove', $(this).parent());
+                //Reload masonry plugin
+                $('#container').masonry( 'reload' );
+                //Hiding existing Arrows
+                $('.rightCorner').remove();
+                $('.leftCorner').remove();
+                //Injecting fresh arrows
+                Arrow_Points();
+            }
+            return false;
+        });
+        
+        $(".timeline_container").click(function(e){
+            //Current Postion 
+            $("#popup").css({'top':(e.pageY+'px')});
+            $("#popup").fadeIn(); //Popup block show
+            //Textbox focus
+            $("#update").focus();
+        }); 
+
+        //Mouseover no action
+        $("#popup").mouseup(function() {return false});
+        //Outside action of the popup block
+        $(document).mouseup(function(){$('#popup').hide();});
+
+        //Update button action
+        $("#update_button").bind('click',function(){
+            //Textbox value
+            var x=$("#update").val();
+            //Ajax Part
+            $("#container").prepend('<div class="item"><a href="#" class="deletebox">X</a>'+x+'</div>');
+            //Reload masonry
+            $('#container').masonry( 'reload' );
+            //Hiding existing arrows
+            $('.rightCorner').remove();
+            $('.leftCorner').remove();
+            //Injecting fresh arrows
+            Arrow_Points();
+            //Clear popup textbox value
+            $("#update").val('');
+            //Popup hide
+            $("#popup").hide();
+            return false;
+        });
+    
+    });
+        </script>
+    </head>
+    <!--body-->
+    <body>
+        <div id='container'>
+            <div class='timeline_container'>
+                <div class='timeline'>
+                    <div class='plus'></div>
+                </div>
+            </div>
+            <div id="popup" class='shade'>
+                <div class="Popup_rightCorner" ></div>
+                <div id='box'>
+                    <b>What's Up?</b><br>
+                    <textarea id='update'></textarea>
+                    <input type='submit' value=' Update ' id='update_button'/>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
